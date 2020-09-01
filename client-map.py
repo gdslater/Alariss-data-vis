@@ -7,7 +7,8 @@ import dash_html_components as html
 
 df = pd.read_csv('client-location-data.csv')
 
-app = dash.Dash()
+app = dash.Dash(__name__)
+server=app.server
 app.layout = html.Div(children=[
     
     html.Div([
@@ -123,5 +124,5 @@ def update_figure(industry):
 
     return fig
 
-#if __name__ == '__main__':
-app.run_server(debug=False)
+if __name__ == '__main__':
+    app.run_server(debug=False)
