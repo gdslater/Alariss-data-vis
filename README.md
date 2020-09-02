@@ -1,8 +1,10 @@
 # Alariss-data-vis
 A data visualization of Alariss clients throughout the world. Created using plotly.
+Click here to view app in browser: https://alariss-client-visual.herokuapp.com/
+Or see below for screenshots of UI.
 
-Below is the app upon being loaded.
+App upon being loaded:
 ![](ui-screenshot.PNG)
 
-Hovering the cities displays information of the industries in that city.
+Hovering the cities displays information of the industries in that city:
 ![](ui-screenshot2.png)
