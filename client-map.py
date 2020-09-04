@@ -10,7 +10,6 @@ df = pd.read_csv('client-location-data.csv')
 app = dash.Dash(__name__)
 server=app.server
 app.layout = html.Div(children=[
-    
     html.Div([
         html.A(
             html.Img(
@@ -28,19 +27,20 @@ app.layout = html.Div(children=[
                 'paddingTop':'5px',
                 'paddingBottom':'5px'})
     ], style={'borderBottom':'1px solid Black',
-    'backgroundColor':'white'}),
+    'marginBottom':'25px'}),
     
     html.Div(children=[
         html.Label('Industries', style={
             'fontFamily':'Arial',
             'color':'Black',
             'fontSize':24,
-            'paddingLeft':'150px'}),
+            'paddingLeft':'20%'
+            }),
         dcc.Dropdown(id='dropdown', style={
             'color':'Black',
             'marginTop':'10px',
             'fontSize':18,
-            'paddingLeft':'150px',
+            'paddingLeft':'20%',
             'fontFamily':'Arial',
             'width':'250px'},
             options=[
@@ -53,13 +53,17 @@ app.layout = html.Div(children=[
             searchable=False,
             clearable=False
         ),
-
-        dcc.Graph(id='map')
-         
-    ], style={
-    'margin':'50px 20px 0px',
-    "backgroundColor":'white'
-    })  
+        html.Div(children=[
+	        dcc.Graph(id='map',
+	        	config={
+	        		'displayModeBar':False,
+	        		'fillFrame':True
+	        	}, style={
+	    			'paddingBottom':'25px'
+	   			 }
+	        )
+	    ], style={'width':'70%', 'margin':'auto'})
+    ])
 ])
 
 @app.callback(
@@ -89,17 +93,18 @@ def update_figure(industry):
 
     df2 = df.copy()
     df2 = df2[df2[industry] > 0]
-
     fig = px.scatter_geo(df2,
         lat="Latitude",
         lon="Longitude",
-        hover_name="City",
+        #hover_name="City",
         opacity=opacity,
         color_discrete_sequence=[hover_color],
         size=industry,
         size_max=30,
         hover_data=hover_data,
-        height = 500,
+        width=1000,
+        height=500,
+        custom_data=['City', 'All', 'Business', 'Education', 'Engineering/Tech']
     )
 
     fig.update_geos(
@@ -107,9 +112,9 @@ def update_figure(industry):
         showland=True, landcolor="white",
         showlakes=True, lakecolor="white",
         showocean=True, oceancolor="#0B1746",
-        showcountries=True, countrycolor="#B2DBFF"
+        showcountries=True, countrycolor="#B2DBFF",
         #fitbounds="locations"
-        )
+    )
 
     fig.update_layout(
         #title = 'Alariss Global Clients',
@@ -117,12 +122,42 @@ def update_figure(industry):
         hoverlabel=dict(
             bgcolor="navy",
             font_size=16),
+        dragmode=False,
+        margin=dict(l=20, r=20, t=20, b=20),
     )
 
-    fig.update_traces(marker=dict(sizemin=5))
+    if industry == 'All':
+    	fig.update_traces(marker=dict(sizemin=5),
+			hovertemplate="<br>".join([
+			"<b>%{customdata[0]}</b><br><br>"
+			"Total Positions: %{customdata[1]}",
+			#"Business Positions: %{customdata[2]}",
+			#"Education Positions: %{customdata[3]}",
+			#"Engineering & Tech Positions: %{customdata[4]}",
+			])
+		)
+    elif industry == 'Business':
+    	fig.update_traces(marker=dict(sizemin=5),
+			hovertemplate="<br>".join([
+				"<b>%{customdata[0]}</b><br><br>"
+				"Business Positions: %{customdata[2]}",
+			])
+		)
+    elif industry == 'Education':
+    	fig.update_traces(marker=dict(sizemin=5),
+			hovertemplate="<br>".join([
+				"<b>%{customdata[0]}</b><br><br>"
+				"Education Positions: %{customdata[3]}",
+		]))
+    elif industry == 'Engineering/Tech':
+    	fig.update_traces(marker=dict(sizemin=5),
+	    	hovertemplate="<br>".join([
+				"<b>%{customdata[0]}</b><br><br>"
+				"Engineering & Tech Positions: %{customdata[4]}",
+		]))
     # fig.show()
 
     return fig
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
